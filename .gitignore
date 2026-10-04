@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.env
+.idea/
+.vscode/
+._*
+.DS_Store
+
+# Local scratch: packages built locally, sessions, downloaded benchmark data, traces, caches and
+# experiment outputs stay out of version control. The lab's experiment records are distributed as a
+# separate release archive that unpacks into work/ (see REPRODUCING.md).
+.trace2env/
+sessions/
+work/
+
+# WebArena collector (Playwright MCP)
+node_modules/

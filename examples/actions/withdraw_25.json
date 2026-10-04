@@ -1,0 +1,6 @@
+{
+  "type": "withdraw",
+  "arguments": {
+    "amount": 25
+  }
+}

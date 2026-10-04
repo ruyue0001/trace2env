@@ -1,0 +1,9 @@
+User: Synthetic reference for the hand-authored ledger demo; initial balance is 100.0.
+Action: balance
+Observation: Balance: 100.0
+Action: deposit 5
+Observation: Deposited 5. Balance: 105.0
+Action: withdraw 25
+Observation: Withdrew 25. Balance: 80.0
+Action: withdraw 1000
+Observation: Insufficient funds. Balance: 80.0

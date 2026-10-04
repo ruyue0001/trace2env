@@ -1,0 +1,3 @@
+[submodule "baseline/Word2World"]
+	path = baseline/Word2World
+	url = https://github.com/X1AOX1A/Word2World.git

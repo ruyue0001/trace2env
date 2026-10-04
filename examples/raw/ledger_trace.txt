@@ -1,0 +1,6 @@
+User: Add twenty dollars.
+Action: {"type":"deposit","arguments":{"amount":20}}
+Observation: Deposited 20. Balance: 120.0
+User: Withdraw more than is available.
+Action: {"type":"withdraw","arguments":{"amount":200}}
+Observation: Insufficient funds. Balance: 120.0

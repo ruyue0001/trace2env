@@ -1,0 +1,7 @@
+# The replay fixture records the SHA-256 of these exact reference bytes.
+examples/replay/ledger_reference.txt text eol=lf
+# Shell and Python sources must keep LF line endings on every platform (bash rejects CRLF scripts).
+*.sh text eol=lf
+*.py text eol=lf
+# The bundled Qwen-AgentWorld judge prompts are verbatim upstream files; keep their bytes stable.
+src/trace2env/agentworld_prompts/** text eol=lf

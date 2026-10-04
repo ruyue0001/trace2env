@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "trace2env"
+version = "0.2.0"
+description = "Recover inspectable, agentic language world models from raw trajectories."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [{name = "Trace2Env contributors"}]
+dependencies = [
+  "pydantic>=2.10,<3",
+  "openai>=2.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "httpx>=0.27"]  # httpx: the transport-error tests build httpx exceptions directly
+
+[project.scripts]
+trace2env = "trace2env.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/trace2env"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

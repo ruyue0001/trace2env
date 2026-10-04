@@ -1,0 +1,8 @@
+{
+  "name": "trace2env-webarena-collector",
+  "private": true,
+  "description": "Pinned Playwright MCP server for scripts/collect_webarena.py (0.0.68 reproduces the AgentWorldBench web split's result text; 0.0.69+ writes snapshots to files, 0.0.60 and older lack the js fence and the Console line). Needs Node 18+: `npm install` here, then `npx playwright install chromium`.",
+  "dependencies": {
+    "@playwright/mcp": "0.0.68"
+  }
+}
