@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/logo.png" alt="Trace2Env logo" width="700">
+  <img src="./assets/logo.png" alt="Trace2Env logo" width="250">
 </div>
 
 <h1 align="center">
