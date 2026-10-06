@@ -11,7 +11,7 @@
     <a href="https://arxiv.org/abs/2610.06100"><img src="https://img.shields.io/badge/arXiv-2610.06100-ff6b6b?style=for-the-badge&logo=arxiv&logoColor=white" alt="arXiv"></a>
     <a href="https://huggingface.co/papers/2610.06100"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Paper-page-ffd21e?style=for-the-badge" alt="Hugging Face paper page"></a>
     <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Demo-Space-0f8a5f?style=for-the-badge" alt="Live demo"></a>
-    <a href="https://ruyue0001.github.io/trace2env/"><img src="https://img.shields.io/badge/Project-page-2457c5?style=for-the-badge&logo=githubpages&logoColor=white" alt="Project page"></a>
+    <a href="https://quanyulong.net/trace2env/"><img src="https://img.shields.io/badge/Project-page-2457c5?style=for-the-badge&logo=githubpages&logoColor=white" alt="Project page"></a>
     <a href="https://github.com/ruyue0001/trace2env/stargazers"><img src="https://img.shields.io/github/stars/ruyue0001/trace2env?color=f1e05a&style=for-the-badge&logo=star&logoColor=white" alt="Stars"></a>
     <a href="https://github.com/ruyue0001/trace2env/forks"><img src="https://img.shields.io/github/forks/ruyue0001/trace2env?color=2ea44f&style=for-the-badge&logo=git&logoColor=white" alt="Forks"></a>
     <a href="https://github.com/ruyue0001/trace2env/issues"><img src="https://img.shields.io/github/issues/ruyue0001/trace2env?color=d73a49&style=for-the-badge&logo=github&logoColor=white" alt="Issues"></a>
@@ -73,7 +73,7 @@ demo runs on DeepSeek V4.1-Flash through OpenRouter with a free allowance per vi
 
 - 🚀 **[2026-10]** Trace2Env is released. The paper, *From Traces to Agentic Worlds: Agentic Language World Models for
   Interactive Environment Simulation*, is on [arXiv](https://arxiv.org/abs/2610.06100) and
-  [Hugging Face Papers](https://huggingface.co/papers/2610.06100); the [project page](https://ruyue0001.github.io/trace2env/)
+  [Hugging Face Papers](https://huggingface.co/papers/2610.06100); the [project page](https://quanyulong.net/trace2env/)
   summarizes the method and results, and the [live demo](https://huggingface.co/spaces/Quanyu001/trace2env_demo) lets you
   play against a reconstructed terminal.
 
