@@ -1,20 +1,67 @@
-# Trace2Env
+<div align="center">
+  <img src="./assets/logo.png" alt="Trace2Env logo" width="700">
+</div>
 
-**Recover an environment from its interaction traces and operate it as an agentic language world model, without
-rebuilding the original executable system.**
+<h1 align="center">
+  <b>From Traces to Agentic Worlds: Agentic Language World Models for Interactive Environment Simulation</b>
+</h1>
 
-Many environments that agents need to practice in are unavailable: the system is gone, private, or impractical to
-reproduce, but recorded interactions remain. Trace2Env turns those traces into a running simulator in two steps.
+<div align="center">
+  <p>
+    <a href="https://arxiv.org/abs/2610.06100"><img src="https://img.shields.io/badge/arXiv-2610.06100-ff6b6b?style=for-the-badge&logo=arxiv&logoColor=white" alt="arXiv"></a>
+    <a href="https://github.com/ruyue0001/trace2env/stargazers"><img src="https://img.shields.io/github/stars/ruyue0001/trace2env?color=f1e05a&style=for-the-badge&logo=star&logoColor=white" alt="Stars"></a>
+    <a href="https://github.com/ruyue0001/trace2env/forks"><img src="https://img.shields.io/github/forks/ruyue0001/trace2env?color=2ea44f&style=for-the-badge&logo=git&logoColor=white" alt="Forks"></a>
+    <a href="https://github.com/ruyue0001/trace2env/issues"><img src="https://img.shields.io/github/issues/ruyue0001/trace2env?color=d73a49&style=for-the-badge&logo=github&logoColor=white" alt="Issues"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-Apache--2.0-2EA44F?style=for-the-badge" alt="License"></a>
+  </p>
+</div>
 
-1. **Offline reconstruction** organizes the traces into a reusable **environment worldbook**: action and state schemas,
-   transition rules, invariants, observation contracts, grounded evidence turns, demonstrations and notes, every item
-   tied to the traces that support it. Nothing is learned into model weights and the environment's source is never read.
-2. **Agentic simulation** lets a **world-model agent** serve as the environment for a task agent. For each action it
-   consults the worldbook, the persistent episode state and episodic memory, proposes the next observation together
-   with the state changes that should persist, and a shared **runtime harness** verifies and commits the transition so
-   that its consequences carry into later turns. One worldbook serves many episodes and any OpenAI-compatible backbone.
+## Overview
 
-In the code the worldbook is called a *package* and one episode's state and audit a *session*.
+Agents need environments that respond to their actions and remember the consequences, yet the systems they were
+recorded in are often gone, private, or impractical to reproduce. What usually remains are **interaction traces**: the
+actions an agent took and the observations the environment returned. **Trace2Env** turns those traces into a running
+simulator. It is a learning-free framework that reconstructs the environment's behavior into a reusable **environment
+worldbook** and operates it as an **agentic language world model**, in which a **world-model agent** serves as the
+environment for a task agent.
+
+Trace2Env works in two phases:
+
+1. **Offline reconstruction.** The traces are organized into a worldbook: action and state schemas, transition rules,
+   invariants, observation contracts, grounded evidence turns, demonstrations, and notes. Every item is tied to the
+   traces that support it, and whatever the traces leave unresolved is recorded rather than guessed.
+2. **Agentic simulation.** For each action of the task agent, the world-model agent consults the worldbook, the
+   persistent episode state, and episodic memory, then proposes the next observation together with the state changes
+   that should persist. A shared **runtime harness** verifies the proposal against the schemas, rules, and invariants
+   and commits it, so the consequences of an action carry into every later turn.
+
+❗ **Trace2Env does not recover the original implementation.** It reconstructs the behavior that prior interactions
+exposed: which actions exist, which state matters, how actions change it, which constraints hold, and how observations
+are rendered. The resulting simulator supports continued, stateful interaction without the original source code or a
+live instance of the environment.
+
+**Highlights**
+
+- **Trace-grounded worldbook.** Explicit, inspectable environment knowledge with provenance, built from traces alone;
+  no parameter updates and no access to the environment's source.
+- **Agentic world modeling.** The world-model agent actively retrieves the knowledge each action needs instead of
+  reading a flattened prompt, and cites what it relied on.
+- **Stateful, long-horizon simulation.** Verified state changes persist across turns, so the simulated environment
+  stays consistent with its own history and reproduces the environment's rejections as well as its successes.
+- **Reusable and backbone-agnostic.** One worldbook serves many independent episodes and any OpenAI-compatible model.
+- **Evaluated as a world model.** Built-in protocols for single-turn next-state prediction on AgentWorldBench and for
+  multi-turn interaction replayed in the real environment (EnvScaler, ALFWorld, SciWorld).
+
+<div align="center">
+  <img src="./assets/overview.png" width="1000" alt="Trace2Env framework overview">
+</div>
+
+In the code, the worldbook is called a *package* and one episode's state and audit a *session*.
+
+## 📰 News
+
+- 🚀 **[2026-10]** Trace2Env is released. The paper, *From Traces to Agentic Worlds: Agentic Language World Models for
+  Interactive Environment Simulation*, is available on [arXiv](https://arxiv.org/abs/2610.06100).
 
 ## Install and try it
 
@@ -95,6 +142,20 @@ release archive.
 
 No benchmark data is redistributed. AgentWorldBench, Terminal-Bench 2.0, WebArena, EnvScaler, ALFWorld and SciWorld are
 obtained from their own distributions as described in the guides. The judge prompts under
-`src/trace2env/agentworld_prompts/` are copied verbatim from Qwen-AgentWorld (Apache-2.0, see the NOTICE there).
+`src/trace2env/agentworld_prompts/` are copied verbatim from Qwen-AgentWorld (Apache-2.0; see the NOTICE there).
 Toolathlon's verified trajectories are gated and must not become training data or a retrieval corpus that answers a
-benchmark. The code is released under Apache-2.0 ([LICENSE](LICENSE)); the Word2World submodule keeps its own terms.
+benchmark. The code is released under the Apache License 2.0 ([LICENSE](LICENSE), [NOTICE](NOTICE)); the Word2World
+submodule keeps its own terms.
+
+## 📚 Citation
+
+If you find Trace2Env useful in your research, please consider citing our paper:
+
+```bibtex
+@article{long2026agenticworlds,
+  title={From Traces to Agentic Worlds: Agentic Language World Models for Interactive Environment Simulation},
+  author={Long, Quanyu and Chen, Xiao and Chen, Jianda and Zhang, Haozhen and Hu, Qisheng and Bao, Jianzhu and Wang, Wenya},
+  journal={arXiv preprint arXiv:2610.06100},
+  year={2026}
+}
+```

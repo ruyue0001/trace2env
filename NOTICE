@@ -1,0 +1,6 @@
+Trace2Env
+Copyright 2026 Trace2Env contributors
+
+This product includes the AgentWorldBench judge prompts of Qwen-AgentWorld
+(https://github.com/QwenLM/Qwen-AgentWorld), Apache License 2.0; see
+src/trace2env/agentworld_prompts/NOTICE.md.
