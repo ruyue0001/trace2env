@@ -33,20 +33,24 @@
 <div align="center">
   <b>🕹️ A Terminal simulated entirely by a world model agent.</b>
 </div>
+
 <div align="center">
   <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo">
     <img
       src="assets/demo.gif"
-      width="880"
+      width="800"
       alt="Trace2Env simulating a stateful Terminal environment"
     >
   </a>
 </div>
-<div align="center">
+
+<p align="center">
   <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo">
     <b>▶ Try the live playground →</b>
   </a>
-</div>
+</p>
+
+<br>
 
 Specifically, Trace2Env works in two phases:
 
