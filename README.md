@@ -19,55 +19,35 @@
   </p>
 </div>
 
-## Overview
 
-Agents need environments that respond to their actions and remember the consequences, yet the systems they were
-recorded in are often gone, private, or impractical to reproduce. What usually remains are **interaction traces**: the
-actions an agent took and the observations the environment returned. **Trace2Env** turns those traces into a running
-simulator. It is a learning-free framework that reconstructs the environment's behavior into a reusable **environment
-worldbook** and operates it as an **agentic language world model**, in which a **world-model agent** serves as the
-environment for a task agent.
+## 🧩 Overview
 
-Trace2Env works in two phases:
+**Trace2Env** is a training-free framework for building **agentic language world models**. It is not tied to a particular environment domain: as long as past action–observation trajectories are available, Trace2Env can simulate an environment from the behavior they expose.
 
-1. **Offline reconstruction.** The traces are organized into a worldbook: action and state schemas, transition rules,
-   invariants, observation contracts, grounded evidence turns, demonstrations, and notes. Every item is tied to the
-   traces that support it, and whatever the traces leave unresolved is recorded rather than guessed.
-2. **Agentic simulation.** For each action of the task agent, the world-model agent consults the worldbook, the
-   persistent episode state, and episodic memory, then proposes the next observation together with the state changes
-   that should persist. A shared **runtime harness** verifies the proposal against the schemas, rules, and invariants
-   and commits it, so the consequences of an action carry into every later turn.
+The [paper](https://arxiv.org/abs/2610.06100) evaluates Trace2Env on terminals, software repositories, Android and web apps, tool-based enterprise services, and text games. The same machinery applies to any system that interacts in text: internal enterprise systems and ticketing workflows, cloud and DevOps consoles, API and MCP tool backends, legacy systems that no longer run, and interactive fiction.
 
-❗ **Trace2Env does not recover the original implementation.** It reconstructs the behavior that prior interactions
-exposed: which actions exist, which state matters, how actions change it, which constraints hold, and how observations
-are rendered. The resulting simulator supports continued, stateful interaction without the original source code or a
-live instance of the environment.
+Trace2Env does not recover the original executable system. Instead, a model of the environment dynamics is reconstructed automatically from observed traces. 🕹️ Try our simulated Terminal environment in the **[live demo](https://huggingface.co/spaces/Quanyu001/trace2env_demo)**!
 
-**Highlights**
+Specifically, Trace2Env works in two phases:
 
-- **Trace-grounded worldbook.** Explicit, inspectable environment knowledge with provenance, built from traces alone;
-  no parameter updates and no access to the environment's source.
-- **Agentic world modeling.** The world-model agent actively retrieves the knowledge each action needs instead of
-  reading a flattened prompt, and cites what it relied on.
-- **Stateful, long-horizon simulation.** Verified state changes persist across turns, so the simulated environment
-  stays consistent with its own history and reproduces the environment's rejections as well as its successes.
-- **Reusable and backbone-agnostic.** One worldbook serves many independent episodes and any OpenAI-compatible model.
-- **Evaluated as a world model.** Built-in protocols for single-turn next-state prediction on AgentWorldBench and for
-  multi-turn interaction replayed in the real environment (EnvScaler, ALFWorld, SciWorld).
+1. **Offline reconstruction.** Past trajectories are processed and organized into a **worldbook** containing environment schemas, transition rules, constraints, invariants, observation contracts, grounded evidence, and demonstrations. Check out what a worldbook looks like [here](https://huggingface.co/spaces/Quanyu001/trace2env_demo/tree/main/worldbook).
+
+2. **Agentic simulation.** A **world model agent** actively calls tools to inspect the worldbook, together with the maintained episode state and episodic memory, and infers the next observation together with the state changes that should persist. A shared runtime harness verifies the proposal against the schemas, rules, and invariants and commits the accepted changes, so the consequences of a task agent's action carry into later turns.
 
 <div align="center">
   <img src="./assets/overview.png" width="1000" alt="Trace2Env framework overview">
 </div>
 
-In the code, the worldbook is called a *package* and one episode's state and audit a *session*.
 
-## 🕹️ Try it
+### ✨ Highlights
 
-Play the task agent against a terminal that Trace2Env reconstructed from Terminal-Bench 2.0 traces, in your browser:
-**[huggingface.co/spaces/Quanyu001/trace2env_demo](https://huggingface.co/spaces/Quanyu001/trace2env_demo)**. Type
-`echo hi > report.txt`, `cat report.txt`, `rm report.txt`, `cat report.txt` and watch the simulated environment remember
-what you did; five guided examples cover files, Python scripts, package installs, git and a background web server. The
-demo runs on DeepSeek V4.1-Flash through OpenRouter with a free allowance per visitor; your own OpenRouter key lifts it.
+- **Build from tens of traces.** Worldbook construction needs only recorded interactions, not access to the original executable environment, its source code, dependencies, or infrastructure.
+
+- **Agentic world modeling.** The world model agent actively consults the knowledge needed for each action instead of relying on a single flattened environment prompt.
+
+- **Stateful, long-horizon simulation.** Verified state changes persist across turns, allowing the simulated environment to preserve the consequences of earlier actions throughout an interaction.
+
+- **Evaluated as a world model.** Trace2Env supports both next-observation prediction ([Qwen-AgentWorld](https://github.com/QwenLM/Qwen-AgentWorld)) and successive interaction with the world model to evaluate its long-horizon consistency.
 
 ## 📰 News
 
@@ -97,7 +77,8 @@ python -m trace2env simulate .trace2env/demo-validated --session .trace2env/demo
 ```
 
 The demo worldbook is hand-authored to show the machinery: replay validation against reference cases, promotion to a
-validated package, and a persistent session. [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) follows it file by file.
+validated package, and a persistent session. In the code, a worldbook is called a *package* and one episode's state and
+audit a *session*. [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) follows it file by file.
 Package destinations (`--output`, `--promote-to`) must not already exist.
 
 ## Build a worldbook from your traces
@@ -135,31 +116,23 @@ brief and tools, verification, trust policy, rendering, commit. Two evaluation p
 ## Reproducing the paper
 
 [REPRODUCING.md](REPRODUCING.md) maps every experiment of the paper to its data, scripts and flags. The scripts of each
-environment are under [`experiments/`](experiments/); the frozen worldbooks and collected traces are distributed as a
-release archive.
+environment are under [`experiments/`](experiments/). The frozen Terminal worldbook is published with the
+[live demo](https://huggingface.co/spaces/Quanyu001/trace2env_demo/tree/main/worldbook); the other frozen worldbooks and the collected traces are available on request.
 
 ## Repository layout
 
-| Path | Contents |
-|---|---|
-| `src/trace2env/` | Library and CLI: trace adapters, reconstruction, compiler, runtime harness, world-model agent, state tracking, benchmark adapters, long-horizon runner |
-| `tests/` | 284 tests with scripted models; no network |
+| Path | Contents                                                                                                                                                                 |
+|---|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `src/trace2env/` | Library and CLI: trace adapters, reconstruction, compiler, runtime harness, world model agent, state tracking, benchmark adapters, long-horizon runner                   |
+| `tests/` | 284 tests with scripted models; no network                                                                                                                               |
 | `scripts/` | Stage-by-stage reconstruction driver, trace collection (Terminal-Bench 2.0 with Harbor, WebArena through Playwright MCP), ALFWorld and SciWorld runs, worldbook ablation |
-| `experiments/` | Launchers, cross-fit tooling, audits and report scripts of the paper's experiments, per environment |
-| `docs/` | Architecture, runtime harness, offline validation, prompt contracts, trace collection, benchmark protocol, long-horizon evaluation |
-| `examples/` | The authored ledger demo and a synthetic benchmark file for smoke tests |
-| `baseline/Word2World` | Submodule used by the ALFWorld and SciWorld scripts (task lists, grammar, simulator adapters) |
+| `experiments/` | Launchers, cross-fit tooling, audits and report scripts of the paper's experiments, per environment                                                                      |
+| `docs/` | Architecture, runtime harness, offline validation, prompt contracts, trace collection, benchmark protocol, long-horizon evaluation                                       |
+| `examples/` | The authored ledger demo and a synthetic benchmark file for smoke tests                                                                                                  |
+| `baseline/Word2World` | Submodule used by the ALFWorld and SciWorld scripts (task lists, grammar, simulator adapters)                                                                            |
 
 [DEVELOPMENT.md](DEVELOPMENT.md) has the commands, the code map and the design constraints to preserve.
 
-## Data and licenses
-
-No benchmark data is redistributed. AgentWorldBench, Terminal-Bench 2.0, WebArena, EnvScaler, ALFWorld and SciWorld are
-obtained from their own distributions as described in the guides. The judge prompts under
-`src/trace2env/agentworld_prompts/` are copied verbatim from Qwen-AgentWorld (Apache-2.0; see the NOTICE there).
-Toolathlon's verified trajectories are gated and must not become training data or a retrieval corpus that answers a
-benchmark. The code is released under the Apache License 2.0 ([LICENSE](LICENSE), [NOTICE](NOTICE)); the Word2World
-submodule keeps its own terms.
 
 ## 📚 Citation
 

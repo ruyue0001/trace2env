@@ -3,52 +3,152 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Trace2Env: Agentic Language World Models from Interaction Traces</title>
-  <meta name="description" content="From Traces to Agentic Worlds: Agentic Language World Models for Interactive Environment Simulation. Trace2Env reconstructs interaction traces into an environment worldbook and operates it as a stateful simulated environment.">
+  <title>Trace2Env — Agentic Language World Models from Interaction Traces</title>
+  <meta name="description" content="Trace2Env reconstructs historical interaction traces into a reusable environment worldbook and lets a world-model agent operate it as a faithful, stateful simulated environment.">
   <meta property="og:title" content="From Traces to Agentic Worlds: Agentic Language World Models for Interactive Environment Simulation">
-  <meta property="og:description" content="Trace2Env reconstructs interaction traces into an environment worldbook and lets a world-model agent serve as the environment for a task agent.">
-  <meta property="og:image" content="static/overview.png">
+  <meta property="og:description" content="Trace2Env turns interaction traces into a reusable worldbook that a world-model agent operates as a stateful simulated environment.">
+  <meta property="og:image" content="https://quanyulong.net/trace2env/static/overview.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="static/logo.png">
   <style>
-    :root { --ink: #1b2330; --muted: #5b6573; --line: #e5e8ee; --bg: #ffffff; --panel: #f7f8fa; --accent: #2457c5; --accent-2: #0f8a5f; --warn: #c2410c; }
+    :root {
+      --ink: #18202b;
+      --muted: #5b6573;
+      --line: #e5e8ee;
+      --bg: #ffffff;
+      --panel: #f7f8fa;
+      --panel-2: #fbfcfe;
+      --accent: #2457c5;
+      --accent-soft: #eef4ff;
+      --accent-2: #0f8a5f;
+      --accent-2-soft: #eefaf5;
+    }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
-    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
-    header.hero { padding: 48px 0 24px; text-align: center; border-bottom: 1px solid var(--line); }
-    header .logo { width: 180px; height: auto; }
-    h1 { font-size: 2.05rem; line-height: 1.25; margin: 14px 0 6px; letter-spacing: -0.01em; }
-    h1 .sub { display: block; font-size: 1.15rem; font-weight: 500; color: var(--muted); margin-top: 6px; }
-    .authors { margin: 14px 0 4px; font-size: 1.05rem; } .authors sup { color: var(--muted); font-size: .7em; }
-    .affil { color: var(--muted); font-size: .95rem; margin: 0 0 18px; }
-    .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 18px 0 8px; }
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: var(--ink); color: #fff; font-weight: 600; font-size: .95rem; border: 1px solid var(--ink); }
-    .btn:hover { background: #2d3a4d; text-decoration: none; } .btn.alt { background: #fff; color: var(--ink); } .btn.alt:hover { background: var(--panel); }
-    .btn.demo { background: var(--accent-2); border-color: var(--accent-2); } .btn.demo:hover { background: #0b6e4b; }
-    section { padding: 36px 0; border-bottom: 1px solid var(--line); }
-    h2 { font-size: 1.5rem; margin: 0 0 14px; letter-spacing: -0.01em; } h3 { font-size: 1.12rem; margin: 22px 0 8px; }
-    p { margin: 0 0 14px; } .lead { font-size: 1.08rem; }
-    figure { margin: 18px 0; } figure img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
-    figcaption { color: var(--muted); font-size: .92rem; margin-top: 8px; line-height: 1.5; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0; }
-    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
-    .card h3 { margin: 0 0 6px; font-size: 1.02rem; } .card p { margin: 0; font-size: .95rem; color: #2c3644; }
-    .callout { border-left: 4px solid var(--accent); background: var(--panel); padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 16px 0; }
-    .callout.demo { border-color: var(--accent-2); }
-    table { width: 100%; border-collapse: collapse; font-size: .92rem; margin: 10px 0 6px; }
-    th, td { padding: 7px 9px; border-bottom: 1px solid var(--line); text-align: right; } th:first-child, td:first-child { text-align: left; }
-    thead th { border-bottom: 2px solid var(--ink); font-weight: 600; } tr.group td { background: var(--panel); font-weight: 600; text-align: left; color: var(--muted); }
-    tr.ours td { font-weight: 700; } td.best { color: var(--accent); }
-    .two { display: grid; grid-template-columns: 1.15fr .85fr; gap: 24px; align-items: start; }
-    pre { background: #0f172a; color: #e5eefc; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: .88rem; line-height: 1.5; }
+    html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 17px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+    .prose { max-width: 840px; }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav .wrap { min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand { color: var(--ink); font-weight: 750; letter-spacing: -.01em; }
+    .navlinks { display: flex; flex-wrap: wrap; gap: 16px; font-size: .9rem; }
+    .navlinks a { color: var(--muted); }
+
+    header.hero {
+      padding: 52px 0 32px;
+      text-align: center;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+    }
+    header .logo { width: 150px; height: auto; }
+    h1 { font-size: clamp(2rem, 4.2vw, 2.9rem); line-height: 1.16; margin: 14px 0 8px; letter-spacing: -0.025em; }
+    h1 .sub { display: block; font-size: clamp(1.02rem, 2.3vw, 1.32rem); font-weight: 520; color: var(--muted); margin-top: 9px; letter-spacing: -.01em; }
+    .authors { margin: 17px 0 4px; font-size: 1.04rem; }
+    .authors sup { color: var(--muted); font-size: .7em; }
+    .affil { color: var(--muted); font-size: .94rem; margin: 0 0 20px; }
+    .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 22px 0 4px; }
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; background: var(--ink); color: #fff; font-weight: 650; font-size: .94rem; border: 1px solid var(--ink); }
+    .btn:hover { background: #2b3748; text-decoration: none; }
+    .btn.alt { background: #fff; color: var(--ink); }
+    .btn.alt:hover { background: var(--panel); }
+    .btn.demo { background: var(--accent-2); border-color: var(--accent-2); }
+    .btn.demo:hover { background: #0b6e4b; }
+
+    main > section { padding: 38px 0; border-bottom: 1px solid var(--line); }
+    h2 { font-size: 1.58rem; line-height: 1.25; margin: 0 0 14px; letter-spacing: -0.018em; }
+    h3 { font-size: 1.12rem; margin: 24px 0 9px; }
+    p { margin: 0 0 14px; }
+    .lead { font-size: 1.08rem; color: #2b3543; }
+    .section-intro { max-width: 850px; color: #334052; }
+
+    figure { margin: 18px 0; }
+    figure img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    figcaption { color: var(--muted); font-size: .91rem; margin-top: 9px; line-height: 1.5; }
+
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0; }
+    .grid.four { grid-template-columns: repeat(2, 1fr); }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 13px; padding: 17px 18px; }
+    .card h3 { margin: 0 0 7px; font-size: 1.02rem; }
+    .card p { margin: 0; font-size: .95rem; color: #2c3644; }
+    .highlight-card { background: var(--panel-2); }
+    .highlight-card h3 { font-size: 1.03rem; }
+
+    .callout { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 13px 17px; border-radius: 0 10px 10px 0; margin: 18px 0; }
+    .callout.demo { border-color: var(--accent-2); background: var(--accent-2-soft); }
+    .callout strong { color: #172033; }
+
+    .two { display: grid; grid-template-columns: 1.12fr .88fr; gap: 25px; align-items: start; }
+    .experiment-block { margin-top: 28px; }
+    .experiment-block:first-of-type { margin-top: 20px; }
+    .experiment-split { display: grid; grid-template-columns: .78fr 1.22fr; gap: 28px; align-items: start; margin-top: 12px; }
+    .ablation-split { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; margin-top: 12px; }
+    .compact-table table { min-width: 0; }
+    .compact-table th:first-child, .compact-table td:first-child { width: 55%; }
+    .case-figure { max-width: 780px; margin-left: auto; margin-right: auto; }
+    .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: .91rem; margin: 10px 0 6px; min-width: 690px; }
+    th, td { padding: 7px 9px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; white-space: normal; }
+    thead th { border-bottom: 2px solid var(--ink); font-weight: 650; }
+    tr.group td { background: var(--panel); font-weight: 650; text-align: left; color: var(--muted); }
+    tr.ours td { font-weight: 750; }
+    td.best { color: var(--accent); }
+    .small { font-size: .91rem; color: var(--muted); }
+
+    pre { background: #0f172a; color: #e5eefc; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: .87rem; line-height: 1.5; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .93em; }
-    .small { font-size: .92rem; color: var(--muted); }
-    footer { padding: 28px 0 40px; color: var(--muted); font-size: .9rem; text-align: center; }
-    @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } .two { grid-template-columns: 1fr; } h1 { font-size: 1.6rem; } body { font-size: 16px; } table { font-size: .84rem; } th, td { padding: 6px 6px; } }
+    .citation-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .copy-btn { cursor: pointer; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 8px; padding: 7px 10px; font: inherit; font-size: .86rem; }
+    .copy-btn:hover { background: var(--panel); }
+
+    footer { padding: 30px 0 42px; color: var(--muted); font-size: .9rem; text-align: center; }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .grid.four { grid-template-columns: 1fr 1fr; }
+      .two, .experiment-split, .ablation-split { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 680px) {
+      body { font-size: 16px; }
+      .navlinks { display: none; }
+      header.hero { padding-top: 38px; }
+      .grid.four { grid-template-columns: 1fr; }
+      .wrap { padding: 0 17px; }
+      .links { gap: 8px; }
+      .btn { padding: 8px 13px; }
+      table { font-size: .84rem; }
+      th, td { padding: 6px 7px; }
+    }
   </style>
 </head>
 <body>
+<nav class="nav" aria-label="Project sections">
+  <div class="wrap">
+    <a class="brand" href="#top">Trace2Env</a>
+    <div class="navlinks">
+      <a href="#overview">Overview</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#case">Case study</a>
+      <a href="#bibtex">Citation</a>
+    </div>
+  </div>
+</nav>
 <header class="hero">
   <div class="wrap">
     <img class="logo" src="static/logo.png" alt="Trace2Env">
@@ -71,119 +171,162 @@
   <section id="teaser">
     <figure>
       <img src="static/overview.png" alt="From interaction traces to an agent-operated simulated environment">
-      <figcaption><b>From interaction traces to an agent-operated simulated environment.</b> Trace2Env reconstructs traces into a reusable environment worldbook containing schemas, grounded evidence, and induced behavioral knowledge. During simulation, a task agent supplies actions, while a world model agent actively consults the worldbook together with the current episode state and episodic memory to infer their consequences and predict the resulting observations.</figcaption>
+      <figcaption><b>From interaction traces to an agent-operated simulated environment.</b> Trace2Env reconstructs traces into a reusable environment worldbook containing schemas, grounded evidence, and induced behavioral knowledge. During simulation, a task agent supplies actions, while a world-model agent consults the worldbook together with the current episode state and episodic memory to infer their consequences and predict the resulting observations.</figcaption>
     </figure>
-    <div class="callout demo">
-      <b>Try it in your browser.</b> The <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo">live demo</a> puts you in the task agent's seat against a terminal that Trace2Env reconstructed from Terminal-Bench 2.0 traces: type <code>echo hi &gt; report.txt</code>, <code>cat report.txt</code>, <code>rm report.txt</code>, <code>cat report.txt</code> and watch the simulated environment remember what you did. Five guided examples cover files, Python scripts, package installs, git, and a background web server.
+    <div class="callout demo"><strong>Come and try our <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo">live demo</a>.</strong></div>
+  </section>
+
+  <section id="overview">
+    <h2>Trace2Env at a glance</h2>
+    <p class="lead prose">Trace2Env is a learning-free framework for reconstructing simulated environments from historical interaction traces. Offline, it builds an <b>environment worldbook</b> that keeps reusable schemas, grounded evidence, induced behavioral abstractions, and provenance. Online, a dedicated world-model agent actively inspects that knowledge together with <b>persistent episode state</b> and <b>episodic memory</b>, proposes the next observation and lasting state effects, and lets a shared harness validate and commit the transition.</p>
+
+    <div class="grid four">
+      <div class="card highlight-card">
+        <h3>Build environments from tens of traces.</h3>
+        <p>Trace2Env reconstructs a reusable behavioral worldbook from recorded interactions, without requiring the original environment's source code, dependencies, or infrastructure during simulation.</p>
+      </div>
+      <div class="card highlight-card">
+        <h3>Agentic world modeling.</h3>
+        <p>The world-model agent actively consults the schemas, rules, evidence, state, and memory needed for the current action instead of receiving the entire reconstructed environment as one flattened prompt.</p>
+      </div>
+      <div class="card highlight-card">
+        <h3>Stateful, long-horizon simulation.</h3>
+        <p>Accepted state effects persist across turns, so later responses reflect the consequences of earlier actions—even when the earlier action itself produced little or no informative output.</p>
+      </div>
+      <div class="card highlight-card">
+        <h3>Evaluated as a world model.</h3>
+        <p>Measure local fidelity with next-observation prediction on <a href="https://github.com/QwenLM/Qwen-AgentWorld">AgentWorldBench</a>, or let a task agent interact successively with the simulated environment and replay its actions in the real environment to measure long-horizon consistency.</p>
+      </div>
     </div>
   </section>
 
-  <section id="abstract">
-    <h2>Abstract</h2>
-    <p class="lead">Realistic environment replicas are increasingly valuable for training and evaluating LLM agents, yet the original systems may be inaccessible or impractical to reproduce. We explore <b>agentic language world modeling</b>: rather than rebuilding an executable environment, a world model agent serves as the environment for a task agent and supports faithful and stateful simulation. We instantiate this paradigm with <b>Trace2Env</b>, a learning-free framework for settings where the original system is unavailable but historical interaction traces remain accessible. Trace2Env reconstructs these traces into a reusable <b>environment worldbook</b> containing environment schemas, grounded evidence, and induced behavioral knowledge. At runtime, the world model agent actively consults the worldbook together with persistent episodic state to infer each action's observation and lasting state effects. Across nine environments, Trace2Env improves both next-observation fidelity and long-horizon interaction consistency over conventional prompt-based language world models. In multi-turn interaction, task agent actions generated against Trace2Env remain valid more often when replayed in the real environment, indicating that its simulated dynamics better preserve the consequences of earlier actions across successive turns. These results establish agentic language world modeling as an alternative direction for building realistic environment replicas without reconstructing the original executable system.</p>
-  </section>
-
-  <section id="why">
-    <h2>Why a world model needs to act</h2>
-    <p>A language world model predicts the observation an environment would return to an action. Prompting a model with the environment description and the whole history works for a single step, but interaction is stateful: deleting <code>report.txt</code> prints nothing, yet a later <code>cat report.txt</code> must fail. The consequence is latent in the history and has to be <em>inferred when it happens and preserved for later turns</em>. A flattened prompt mixes heterogeneous environment knowledge with long-horizon state and leaves both to one pass of attention.</p>
-    <p>Trace2Env treats simulation itself as an agentic task. Environment knowledge is externalized into a worldbook that a dedicated world model agent inspects as needed, episode state and memory persist across turns, and a shared harness verifies and commits every proposed transition. <b>An agent serves as the environment for another agent.</b></p>
+  <section id="idea">
+    <h2>Motivation</h2>
+    <div class="prose">
+      <p>Consider <code>rm report.txt</code>. The command may print almost nothing, but it changes the environment. Many turns later, <code>cat report.txt</code> should fail. The relevant consequence is therefore not always visible in the observation that immediately follows the action: it has to be inferred when it happens and preserved for later turns.</p>
+      <p>Conventional prompting places the environment description, interaction history, and current action into a single prediction context. Trace2Env instead separates <b>reusable environment knowledge</b> from <b>what is currently true in this episode</b>, and treats simulation itself as an agentic task.</p>
+    </div>
+    <div class="callout"><strong>An agent serves as the environment for another agent.</strong> The task agent decides what to do; the world-model agent determines what the environment does next.</div>
   </section>
 
   <section id="method">
     <h2>Method</h2>
     <figure>
-      <img src="static/method.png" alt="Trace2Env framework: environment reconstruction, trace-grounded worldbook, agentic simulation">
-      <figcaption><b>Trace2Env framework.</b> Trace2Env reconstructs historical traces into an environment worldbook and uses a world model agent to operate it as a stateful simulated environment.</figcaption>
+      <img loading="lazy" src="static/method.png" alt="Trace2Env framework: environment reconstruction, worldbook, persistent episode workspace, and agentic simulation">
+      <figcaption><b>Trace2Env framework.</b> Historical traces are reconstructed into a fixed environment worldbook. During a new episode, the world-model agent combines that reusable knowledge with mutable episode state and episodic memory, then proposes a transition that the harness validates and commits.</figcaption>
     </figure>
+
     <div class="grid">
-      <div class="card"><h3>A. Environment reconstruction</h3><p>Traces are normalized and aligned into action–observation slices; local evidence (observed facts, candidate effects, preconditions, exact observations) is extracted per transition; interfaces and reusable knowledge are induced from supporting and contrasting cases and reviewed by a falsification pass. Nothing is learned into weights and the environment's source is never read.</p></div>
-      <div class="card"><h3>B. Trace-grounded worldbook</h3><p>Action and state schemas, grounded evidence (observed transitions and demonstrations), induced abstractions (rules, contracts, conventions), and provenance back to the source turns. An applicability gate labels each retrieved item as <em>supporting</em>, <em>uncertain</em> or <em>format-only</em> for the current episode.</p></div>
-      <div class="card"><h3>C. Agentic simulation</h3><p>For each action the world model agent interprets the intent, gathers information (state, memory, worldbook), and proposes a transition: state effects plus the next observation. The harness validates it against schemas, rules and invariants, commits the state and memory, and returns the observation. Consequences carry into every later turn.</p></div>
+      <div class="card">
+        <h3>1. Reconstruct a worldbook</h3>
+        <p>Align action–observation transitions, retain the original observations as grounded evidence, induce action and state schemas, and derive reusable rules, constraints, response contracts, conventions, and provenance. Model weights remain fixed.</p>
+      </div>
+      <div class="card">
+        <h3>2. Maintain an episode workspace</h3>
+        <p>The immutable worldbook describes how the environment behaves. Mutable state records what is currently true in this episode, while episodic memory preserves earlier action–observation turns and details that need not fit into the state schema.</p>
+      </div>
+      <div class="card">
+        <h3>3. Simulate agentically</h3>
+        <p>For each action, the world-model agent selectively inspects relevant knowledge, state, and memory, then proposes state effects plus the next observation. The harness validates represented effects against schemas and constraints, commits accepted state changes, and returns the observation.</p>
+      </div>
     </div>
   </section>
 
   <section id="results">
     <h2>Results</h2>
-    <h3>Single-turn next-observation fidelity</h3>
-    <p>AgentWorldBench's official five-dimension judge (format, factuality, consistency, realism, quality; 0–100) on its Terminal, SWE, Android and Web splits plus three EnvScaler environments, with two world model backbones. All worldbooks were reconstructed once with gpt-5.6-sol and kept fixed, so the DeepSeek rows also test whether a worldbook built by one model can be operated by another.</p>
-    <table>
-      <thead><tr><th>Method</th><th>Terminal</th><th>SWE</th><th>Android</th><th>Web</th><th>Food</th><th>Shopping</th><th>Benefits</th><th>Avg.</th></tr></thead>
-      <tbody>
-        <tr class="group"><td colspan="9">World model backbone: gpt-5.6-sol</td></tr>
-        <tr><td>Direct Prompting</td><td>55.76</td><td>65.87</td><td>62.80</td><td>54.23</td><td>81.67</td><td>77.32</td><td>88.89</td><td>69.51</td></tr>
-        <tr><td>Trace RAG Prompting</td><td>58.42</td><td>66.50</td><td class="best">66.50</td><td>57.12</td><td>85.57</td><td class="best">86.07</td><td>96.11</td><td>73.76</td></tr>
-        <tr><td>Worldbook Prompting</td><td>59.07</td><td>67.82</td><td>65.53</td><td>57.70</td><td>86.74</td><td>85.89</td><td>97.68</td><td>74.35</td></tr>
-        <tr><td>Harness only</td><td>60.06</td><td>69.89</td><td>62.62</td><td>55.40</td><td>82.07</td><td>77.62</td><td>87.89</td><td>70.79</td></tr>
-        <tr class="ours"><td>Trace2Env</td><td class="best">65.42</td><td class="best">70.59</td><td>65.10</td><td class="best">59.55</td><td class="best">87.43</td><td>85.36</td><td class="best">98.11</td><td class="best">75.94</td></tr>
-        <tr class="group"><td colspan="9">World model backbone: deepseek-v4.1-flash</td></tr>
-        <tr><td>Direct Prompting</td><td>60.65</td><td>63.50</td><td>57.25</td><td>52.50</td><td>80.10</td><td>77.56</td><td>89.44</td><td>68.71</td></tr>
-        <tr><td>Trace RAG Prompting</td><td>61.90</td><td>66.18</td><td>60.78</td><td>54.65</td><td>85.97</td><td>84.40</td><td>97.56</td><td>73.06</td></tr>
-        <tr><td>Worldbook Prompting</td><td class="best">65.24</td><td>69.31</td><td>62.65</td><td>55.64</td><td>87.53</td><td>85.54</td><td>98.10</td><td>74.86</td></tr>
-        <tr><td>Harness only</td><td>62.06</td><td>66.06</td><td>60.10</td><td>52.55</td><td>82.77</td><td>77.50</td><td>91.44</td><td>70.35</td></tr>
-        <tr class="ours"><td>Trace2Env</td><td>64.12</td><td class="best">70.17</td><td class="best">65.50</td><td class="best">57.85</td><td class="best">88.20</td><td class="best">86.07</td><td class="best">98.33</td><td class="best">75.75</td></tr>
-      </tbody>
-    </table>
-    <p class="small">Trace2Env is best on average with both backbones and never below Direct Prompting; the worldbook (compare Worldbook Prompting) and the runtime harness (compare Harness only) contribute complementary gains, and the gains persist on tasks absent from the construction traces.</p>
+    <p class="section-intro">We evaluate Trace2Env in two complementary settings: <b>single-turn next-observation prediction</b> across seven environments, and <b>multi-turn interaction consistency</b> on ALFWorld and SciWorld. All worldbooks are reconstructed once with GPT-5.6-Sol and kept fixed across world-model backbones.</p>
 
-    <div class="two">
-      <div>
-        <h3>Long-horizon interaction consistency</h3>
-        <p>A task agent solves each task in the real environment (<b>Real</b>) and inside the world model (<b>WM</b>); the actions it produced inside the world model are then replayed in the real environment (<b>W2R</b>). <b>CR = W2R / Real</b> measures how much real competence survives when interaction is mediated by the world model.</p>
+    <div class="experiment-block">
+      <h3>Single-turn next-observation fidelity</h3>
+      <p>AgentWorldBench's official five-dimension judge scores format, factuality, consistency, realism, and quality on a 0–100 scale. Trace2Env obtains the best average score with both backbones and outperforms Direct Prompting in every environment–backbone pair.</p>
+      <div class="table-wrap">
         <table>
-          <thead><tr><th>World model</th><th>Real</th><th>WM</th><th>W2R</th><th>CR</th></tr></thead>
+          <thead><tr><th>Method</th><th>Terminal</th><th>SWE</th><th>Android</th><th>Web</th><th>Food</th><th>Shopping</th><th>Benefits</th><th>Avg.</th></tr></thead>
           <tbody>
-            <tr class="group"><td colspan="5">ALFWorld</td></tr>
-            <tr><td>Direct Prompting</td><td>93%</td><td>97%</td><td>3%</td><td>0.032</td></tr>
-            <tr class="ours"><td>Trace2Env</td><td>93%</td><td>88%</td><td class="best">85%</td><td class="best">0.914</td></tr>
-            <tr class="group"><td colspan="5">SciWorld</td></tr>
-            <tr><td>Direct Prompting</td><td>85%</td><td>92.5%</td><td>45%</td><td>0.529</td></tr>
-            <tr class="ours"><td>Trace2Env</td><td>85%</td><td>87.5%</td><td class="best">60%</td><td class="best">0.706</td></tr>
+            <tr class="group"><td colspan="9">World-model backbone: GPT-5.6-Sol</td></tr>
+            <tr><td>Direct Prompting</td><td>55.76</td><td>65.87</td><td>62.80</td><td>54.23</td><td>81.67</td><td>77.32</td><td>88.89</td><td>69.51</td></tr>
+            <tr><td>Trace RAG Prompting</td><td>58.42</td><td>66.50</td><td class="best">66.50</td><td>57.12</td><td>85.57</td><td class="best">86.07</td><td>96.11</td><td>73.76</td></tr>
+            <tr><td>Worldbook Prompting</td><td>59.07</td><td>67.82</td><td>65.53</td><td>57.70</td><td>86.74</td><td>85.89</td><td>97.68</td><td>74.35</td></tr>
+            <tr><td>Harness only</td><td>60.06</td><td>69.89</td><td>62.62</td><td>55.40</td><td>82.07</td><td>77.62</td><td>87.89</td><td>70.79</td></tr>
+            <tr class="ours"><td>Trace2Env</td><td class="best">65.42</td><td class="best">70.59</td><td>65.10</td><td class="best">59.55</td><td class="best">87.43</td><td>85.36</td><td class="best">98.11</td><td class="best">75.94</td></tr>
+            <tr class="group"><td colspan="9">World-model backbone: DeepSeek-V4.1-Flash</td></tr>
+            <tr><td>Direct Prompting</td><td>60.65</td><td>63.50</td><td>57.25</td><td>52.50</td><td>80.10</td><td>77.56</td><td>89.44</td><td>68.71</td></tr>
+            <tr><td>Trace RAG Prompting</td><td>61.90</td><td>66.18</td><td>60.78</td><td>54.65</td><td>85.97</td><td>84.40</td><td>97.56</td><td>73.06</td></tr>
+            <tr><td>Worldbook Prompting</td><td class="best">65.24</td><td>69.31</td><td>62.65</td><td>55.64</td><td>87.53</td><td>85.54</td><td>98.10</td><td>74.86</td></tr>
+            <tr><td>Harness only</td><td>62.06</td><td>66.06</td><td>60.10</td><td>52.55</td><td>82.77</td><td>77.50</td><td>91.44</td><td>70.35</td></tr>
+            <tr class="ours"><td>Trace2Env</td><td>64.12</td><td class="best">70.17</td><td class="best">65.50</td><td class="best">57.85</td><td class="best">88.20</td><td class="best">86.07</td><td class="best">98.33</td><td class="best">75.75</td></tr>
           </tbody>
         </table>
-        <p class="small">A prompted world model looks excellent from the inside and lets the agent "succeed" in a state the real environment never reached. Trace2Env reproduces the environment's refusals as well as its successes, so the behavior it induces transfers.</p>
       </div>
-      <div>
-        <h3>What in the worldbook matters</h3>
-        <table>
-          <thead><tr><th>Variant (Terminal, gpt-5.6-sol)</th><th>Total</th><th>Effect</th></tr></thead>
-          <tbody>
-            <tr><td>Direct Prompting</td><td>55.76</td><td>–</td></tr>
-            <tr><td>Schema only</td><td>62.05</td><td>–</td></tr>
-            <tr><td>&nbsp;&nbsp;+ Abstraction (rules, contracts, notes)</td><td>60.69</td><td>−1.12 ± 0.90</td></tr>
-            <tr><td>&nbsp;&nbsp;+ Evidence (evidence turns, demonstrations)</td><td>64.18</td><td>+2.45 ± 0.89</td></tr>
-            <tr class="ours"><td>Full worldbook</td><td class="best">64.89</td><td></td></tr>
-            <tr><td>&nbsp;&nbsp;Abstraction given Evidence</td><td></td><td>+0.69 ± 0.63</td></tr>
-            <tr><td>&nbsp;&nbsp;Evidence given Abstraction</td><td></td><td>+4.26 ± 1.02</td></tr>
-          </tbody>
-        </table>
-        <figure style="margin-top:14px">
-          <img src="static/trace_scaling.png" alt="Trace scaling on Terminal">
-          <figcaption><b>Trace scaling on Terminal.</b> Next-observation score and one-time worldbook construction cost as the number of construction traces grows; the curve is still rising at 36 traces.</figcaption>
+      <p class="small">Trace2Env is best on average with both backbones. The paper also reports trajectory-clustered confidence intervals and analyses on tasks absent from the construction traces.</p>
+    </div>
+
+    <div class="experiment-block">
+      <h3>Long-horizon interaction consistency</h3>
+      <div class="experiment-split">
+        <div>
+          <p>A task agent solves each task in the real environment (<b>Real</b>) and inside the world model (<b>WM</b>). The actions generated inside the world model are then replayed in the real environment (<b>W2R</b>). <b>CR = W2R / Real</b> measures how much real competence survives when interaction is mediated by the world model.</p>
+          <p class="small">A prompted world model can appear successful while continuing from a false state. W2R tests whether the behavior induced by the simulation remains valid in the real environment.</p>
+        </div>
+        <div class="table-wrap compact-table">
+          <table>
+            <thead><tr><th>World model</th><th>Real</th><th>WM</th><th>W2R</th><th>CR</th></tr></thead>
+            <tbody>
+              <tr class="group"><td colspan="5">ALFWorld</td></tr>
+              <tr><td>Direct Prompting</td><td>93%</td><td>97%</td><td>3%</td><td>0.032</td></tr>
+              <tr class="ours"><td>Trace2Env</td><td>93%</td><td>88%</td><td class="best">85%</td><td class="best">0.914</td></tr>
+              <tr class="group"><td colspan="5">SciWorld</td></tr>
+              <tr><td>Direct Prompting</td><td>85%</td><td>92.5%</td><td>45%</td><td>0.529</td></tr>
+              <tr class="ours"><td>Trace2Env</td><td>85%</td><td>87.5%</td><td class="best">60%</td><td class="best">0.706</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="experiment-block">
+      <h3>Worldbook ablations and trace scaling</h3>
+      <div class="ablation-split">
+        <div>
+          <p>On Terminal, grounded evidence provides the strongest standalone gain, while abstraction becomes useful when paired with evidence.</p>
+          <div class="table-wrap compact-table">
+            <table>
+              <thead><tr><th>Variant</th><th>Total</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td>Direct Prompting</td><td>55.76</td><td>–</td></tr>
+                <tr><td>Schema only</td><td>62.05</td><td>–</td></tr>
+                <tr><td>&nbsp;&nbsp;+ Abstraction</td><td>60.69</td><td>−1.12 ± 0.90</td></tr>
+                <tr><td>&nbsp;&nbsp;+ Evidence</td><td>64.18</td><td>+2.45 ± 0.89</td></tr>
+                <tr class="ours"><td>Full worldbook</td><td class="best">64.89</td><td></td></tr>
+                <tr><td>&nbsp;&nbsp;Abstraction given Evidence</td><td></td><td>+0.69 ± 0.63</td></tr>
+                <tr><td>&nbsp;&nbsp;Evidence given Abstraction</td><td></td><td>+4.26 ± 1.02</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <figure style="margin:0">
+          <img loading="lazy" src="static/trace_scaling.png" alt="Trace scaling on Terminal">
+          <figcaption><b>Trace scaling on Terminal.</b> Next-observation score and one-time worldbook construction cost as the number of construction traces increases.</figcaption>
         </figure>
       </div>
     </div>
   </section>
 
   <section id="case">
-    <h2>A world model must be able to say no</h2>
-    <figure>
-      <img src="static/case_alfworld.png" alt="ALFWorld case: direct prompting accepts an unsupported action, Trace2Env rejects it and the agent recovers">
-      <figcaption><b>One wrong transition derails a whole interaction.</b> The task agent issues an unsupported <code>put</code> command. Direct Prompting hallucinates a successful placement, commits a false state, and reports a success that fails under real-environment replay (reward 0). Trace2Env answers with the environment's own <code>nothing happens</code>, keeps the tissue box in the inventory, and the agent consults <code>help</code>, recovers with the valid <code>move</code> command, and succeeds when replayed (reward 1).</figcaption>
+    <h2>Case Study</h2>
+    <p class="section-intro">The long-horizon benefit is easiest to see when an action should fail. A single hallucinated success can create a fictitious state that remains internally coherent but no longer matches the real environment.</p>
+    <figure class="case-figure">
+      <img loading="lazy" src="static/case_alfworld.png" alt="ALFWorld case: Direct Prompting accepts an unsupported action, while Trace2Env preserves the no-op state and supports recovery">
+      <figcaption><b>One wrong transition derails a whole interaction.</b> The task agent issues an unsupported <code>put</code> command. Direct Prompting hallucinates a successful placement, commits a false state, and reaches a simulated success whose action sequence fails under real-environment replay. Trace2Env predicts the correct <code>Nothing happens.</code>, preserves the tissue box in inventory, and keeps later inventory and help responses consistent with that failure, allowing the task agent to recover with the valid <code>move</code> command.</figcaption>
     </figure>
   </section>
 
-  <section id="resources">
-    <h2>Resources</h2>
-    <div class="grid">
-      <div class="card"><h3>Code</h3><p><a href="https://github.com/ruyue0001/trace2env">github.com/ruyue0001/trace2env</a>: the library and CLI, the scripts of every reported experiment, and a reproduction guide. Apache-2.0.</p></div>
-      <div class="card"><h3>Live demo</h3><p><a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo">Hugging Face Space</a>: play the task agent against the reconstructed terminal, with guided examples; free actions on the Space's key or bring your own OpenRouter key.</p></div>
-      <div class="card"><h3>Paper</h3><p><a href="https://arxiv.org/abs/2610.06100">arXiv:2610.06100</a> · <a href="https://huggingface.co/papers/2610.06100">Hugging Face paper page</a></p></div>
-    </div>
-  </section>
-
   <section id="bibtex">
-    <h2>Citation</h2>
-<pre>@article{long2026agenticworlds,
+    <div class="citation-head">
+      <h2>Citation</h2>
+      <button class="copy-btn" type="button" onclick="copyBibtex(this)">Copy BibTeX</button>
+    </div>
+<pre id="bibtex-code">@article{long2026agenticworlds,
   title={From Traces to Agentic Worlds: Agentic Language World Models for Interactive Environment Simulation},
   author={Long, Quanyu and Chen, Xiao and Chen, Jianda and Zhang, Haozhen and Hu, Qisheng and Bao, Jianzhu and Wang, Wenya},
   journal={arXiv preprint arXiv:2610.06100},
@@ -191,8 +334,20 @@
 }</pre>
   </section>
 </main>
+
 <footer>
   <div class="wrap">Trace2Env · <a href="https://github.com/ruyue0001/trace2env">code</a> · <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo">demo</a> · <a href="https://arxiv.org/abs/2610.06100">paper</a></div>
 </footer>
+
+<script>
+  function copyBibtex(btn) {
+    const text = document.getElementById('bibtex-code').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const old = btn.textContent;
+      btn.textContent = 'Copied';
+      setTimeout(() => { btn.textContent = old; }, 1400);
+    });
+  }
+</script>
 </body>
 </html>

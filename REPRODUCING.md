@@ -20,17 +20,17 @@ The three Trace2Env labels differ only in the Applicability Gate's identity sign
 | Item | Where it comes from |
 |---|---|
 | AgentWorldBench test files (`terminal`, `swe`, `android`, `web`) | the [Hugging Face dataset](https://huggingface.co/datasets/Qwen/AgentWorldBench), placed in `work/agentworldbench/<split>_test.jsonl` (never modified) |
-| Terminal-Bench 2.0 traces (20 construction + 16 scaling trajectories, own collection) | release archive; or re-collect with Harbor and Terminus-2 ([docs/TRACE_COLLECTION.md](docs/TRACE_COLLECTION.md)) |
-| WebArena traces (50 own trajectories) | release archive; or self-host WebArena and re-collect through Playwright MCP (`scripts/webarena/`, `scripts/collect_webarena.py`) |
+| Terminal-Bench 2.0 traces (20 construction + 16 scaling trajectories, own collection) | on request (see below); or re-collect with Harbor and Terminus-2 ([docs/TRACE_COLLECTION.md](docs/TRACE_COLLECTION.md)) |
+| WebArena traces (50 own trajectories) | on request; or self-host WebArena and re-collect through Playwright MCP (`scripts/webarena/`, `scripts/collect_webarena.py`) |
 | Android and SWE construction data | the benchmark's own trajectories under a task-grouped k=5 cross-fit (`experiments/android/make_folds.py`, `experiments/swe/make_folds.py`); nothing to download beyond the test files |
-| EnvScaler rollouts and environment definitions | release archive (`work/envscaler/`), converted with `trace2env envscaler-export` (`experiments/envscaler/run_export.sh`) |
+| EnvScaler rollouts and environment definitions | on request (unpack into `work/envscaler/`), converted with `trace2env envscaler-export` (`experiments/envscaler/run_export.sh`) |
 | ALFWorld and SciWorld | the `baseline/Word2World` submodule (task lists, ALFWorld grammar, AgentGym adapters) plus the simulators themselves ([docs/ALFWORLD_REAL.md](docs/ALFWORLD_REAL.md), [docs/ALFWORLD_TRACE2ENV.md](docs/ALFWORLD_TRACE2ENV.md)) |
-| Frozen worldbooks, predictions, judge outputs, call logs of the reported runs | release archive; its directories unpack into `work/` with the layout the scripts expect |
+| Frozen worldbooks, predictions, judge outputs, call logs of the reported runs | the Terminal worldbook is published with the [live demo](https://huggingface.co/spaces/Quanyu001/trace2env_demo/tree/main/worldbook); the others are available on request and unpack into `work/` with the layout the scripts expect |
 | Model access | an OpenAI-compatible endpoint: the reported runs used `openai/gpt-5.6-sol` through OpenRouter (`OPENROUTER_API_KEY`) and `deepseek-v4.1-flash` through DeepSeek's API (`DEEPSEEK_API_KEY`); the judge is `openai/gpt-5.2` through OpenRouter |
 
-The release archive is attached to the tagged release of this repository; each file is listed with its SHA-256 in the
-archive's manifest, and the launchers record the manifest hash of every worldbook they ran, so a reproduction can check
-that it used the same one. Keys are read from environment variables (`--api-key-env`); never put them on a command line.
+Every worldbook's `manifest.json` lists the SHA-256 of each of its files, and the launchers record the manifest hash of
+every worldbook they ran, so a reproduction can check that it used the same one. Keys are read from environment
+variables (`--api-key-env`); never put them on a command line.
 
 ## Worldbook construction
 
