@@ -1,10 +1,14 @@
 <div align="center">
-  <img src="./assets/logo.png" alt="Trace2Env logo" width="250">
+  <img src="./assets/logo.png" alt="Trace2Env logo" width="200">
 </div>
 
 <h1 align="center">
   <b>From Traces to Agentic Worlds: Agentic Language World Models for Interactive Environment Simulation</b>
 </h1>
+
+<h3 align="center">
+  <b>Build world model agents that serve as environments for other agents.</b>
+</h3>
 
 <div align="center">
   <p>
@@ -19,14 +23,23 @@
   </p>
 </div>
 
+## 🧩 Trace2Env Overview
 
-## 🧩 Overview
+- **Trace2Env** is a training-free framework for **agentic world modeling**, designed for faithful, stateful, and long-horizon simulation of textual environments.
+- Environments built with Trace2Env can be used to train agents without the real system, test agents in safe and reproducible sandboxes, build stateful mocks for tools and APIs, or reconstruct unavailable, private, or legacy environments.
+- Trace2Env does not recover the original executable system. Instead, it automatically reconstructs a model of the environment dynamics from observed action–observation trajectories.
+- Trace2Env is not tied to a particular environment domain. The [paper](https://arxiv.org/abs/2610.06100) evaluates it on terminals, software repositories, Android and web apps, enterprise services, and text games. The same framework can be applied to other text-interactive systems, including internal enterprise tools, ticketing workflows, cloud and DevOps consoles, API and MCP backends, and other textual worlds.
 
-**Trace2Env** is a training-free framework for building **agentic language world models**. It is not tied to a particular environment domain: as long as past action–observation trajectories are available, Trace2Env can simulate an environment from the behavior they expose.
-
-The [paper](https://arxiv.org/abs/2610.06100) evaluates Trace2Env on terminals, software repositories, Android and web apps, tool-based enterprise services, and text games. The same machinery applies to any system that interacts in text: internal enterprise systems and ticketing workflows, cloud and DevOps consoles, API and MCP tool backends, legacy systems that no longer run, and interactive fiction.
-
-Trace2Env does not recover the original executable system. Instead, a model of the environment dynamics is reconstructed automatically from observed traces. 🕹️ Try our simulated Terminal environment in the **[live demo](https://huggingface.co/spaces/Quanyu001/trace2env_demo)**!
+<h4 align="center">
+  <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo">
+    <img src="assets/demo.gif" width="1000"
+         alt="Trace2Env interactive Terminal playground">
+  </a>
+  <br>
+  <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo">
+    <b>🕹️ Try a simulated Terminal in our live playground →</b>
+  </a>
+</h4>
 
 Specifically, Trace2Env works in two phases:
 
