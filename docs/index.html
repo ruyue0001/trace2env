@@ -100,6 +100,9 @@
     .compact-table table { min-width: 0; }
     .compact-table th:first-child, .compact-table td:first-child { width: 55%; }
     .case-figure { max-width: 780px; margin-left: auto; margin-right: auto; }
+    .demo-figure { margin-top: 26px; }
+    .demo-figure a { display: block; }
+    .demo-figure img { border-radius: 14px; box-shadow: 0 10px 30px rgba(24,32,43,.10); }
     .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; font-size: .91rem; margin: 10px 0 6px; min-width: 690px; }
     th, td { padding: 7px 9px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
@@ -142,6 +145,7 @@
     <a class="brand" href="#top">Trace2Env</a>
     <div class="navlinks">
       <a href="#overview">Overview</a>
+      <a href="#demo">Demo</a>
       <a href="#method">Method</a>
       <a href="#results">Results</a>
       <a href="#case">Case study</a>
@@ -172,6 +176,10 @@
     <figure>
       <img src="static/overview.png" alt="From interaction traces to an agent-operated simulated environment">
       <figcaption><b>From interaction traces to an agent-operated simulated environment.</b> Trace2Env reconstructs traces into a reusable environment worldbook containing schemas, grounded evidence, and induced behavioral knowledge. During simulation, a task agent supplies actions, while a world-model agent consults the worldbook together with the current episode state and episodic memory to infer their consequences and predict the resulting observations.</figcaption>
+    </figure>
+    <figure id="demo" class="demo-figure">
+      <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo"><img loading="lazy" src="static/demo.gif" alt="Recording of the Trace2Env playground: a world-model agent simulates a terminal; after the task agent renames a file, reading the old name fails with the environment's own error while the new name still reads"></a>
+      <figcaption><b>A Terminal simulated entirely by a world model agent.</b> You are the task agent: you type the commands, the world-model agent answers from the worldbook reconstructed from Terminal-Bench 2.0 traces and the episode state it keeps. The recording creates a file, reads it, renames it, and then reads it under both names.</figcaption>
     </figure>
     <div class="callout demo"><strong>Come and try our <a href="https://huggingface.co/spaces/Quanyu001/trace2env_demo">live demo</a>.</strong></div>
   </section>
