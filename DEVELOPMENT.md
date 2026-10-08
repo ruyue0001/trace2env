@@ -11,7 +11,7 @@ from the repository root.
 ```bash
 git submodule update --init baseline/Word2World     # three ALFWorld tests read its files
 python -m pip install -e '.[dev]'
-python -m pytest                                    # 284 tests (unittest-style classes; `python -m unittest discover -s tests` also works)
+python -m pytest                                    # 285 tests (unittest-style classes; `python -m unittest discover -s tests` also works)
 python -m pytest tests/test_offline_safety.py -k conflicting_equal_priority
 ```
 

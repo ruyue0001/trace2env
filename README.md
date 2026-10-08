@@ -89,7 +89,7 @@ Python 3.11 or newer. The demo below needs no model and no API key.
 git clone --recurse-submodules https://github.com/ruyue0001/trace2env.git
 cd trace2env
 python -m pip install -e '.[dev]'
-python -m pytest                                   # 284 tests, no network
+python -m pytest                                   # 285 tests, no network
 
 python -m trace2env init-demo --output .trace2env/demo-authored
 python -m trace2env inspect .trace2env/demo-authored --action withdraw
@@ -148,7 +148,7 @@ environment are under [`experiments/`](experiments/). The frozen Terminal worldb
 | Path | Contents                                                                                                                                                                 |
 |---|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `src/trace2env/` | Library and CLI: trace adapters, reconstruction, compiler, runtime harness, world model agent, state tracking, benchmark adapters, long-horizon runner                   |
-| `tests/` | 284 tests with scripted models; no network                                                                                                                               |
+| `tests/` | 285 tests with scripted models; no network                                                                                                                               |
 | `scripts/` | Stage-by-stage reconstruction driver, trace collection (Terminal-Bench 2.0 with Harbor, WebArena through Playwright MCP), ALFWorld and SciWorld runs, worldbook ablation |
 | `experiments/` | Launchers, cross-fit tooling, audits and report scripts of the paper's experiments, per environment                                                                      |
 | `docs/` | Architecture, runtime harness, offline validation, prompt contracts, trace collection, benchmark protocol, long-horizon evaluation                                       |
