@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import json
 from datetime import datetime, timezone
 from enum import Enum
@@ -119,10 +120,23 @@ class Fact(StrictModel):
     provenance: list[SourceRef] = Field(default_factory=list)
 
 
+_BRACKET_KEY = re.compile(r"""\[\s*(?:"([^"]*)"|'([^']*)'|([^\]]*?))\s*\]""")
+
+
+def normalize_state_path(path: str) -> str:
+    """Bracket notation becomes dotted: ``world.files["/app/report.txt"].content`` ->
+    ``world.files./app/report.txt.content`` (``engine`` resolves such file-name segments as one key). Models emit
+    both spellings for maps keyed by file paths or URLs; the dotted one is canonical everywhere."""
+    if "[" not in path:
+        return path
+    return _BRACKET_KEY.sub(lambda m: "." + next(g for g in m.groups() if g is not None).strip(), path).replace("..", ".")
+
+
 class StateMutation(StrictModel):
     # ``merge`` updates entries of an object-valued path with the keys of an object value and ``remove``
     # deletes the named key(s) from it: this is how maps keyed by strings that contain dots (file paths,
-    # URLs, identifiers) are edited, since dotted state paths cannot address such keys.
+    # URLs, identifiers) are edited; a file-name segment in a dotted path (``world.files./app/report.txt``,
+    # also written ``world.files["/app/report.txt"]``) addresses the whole entry as well.
     op: Literal["set", "delete", "increment", "decrement", "append", "create", "schedule", "merge", "remove"]
     path: str
     value: Any = None
@@ -131,6 +145,7 @@ class StateMutation(StrictModel):
     @field_validator("path")
     @classmethod
     def valid_state_path(cls, value: str) -> str:
+        value = normalize_state_path(value)
         if value.split(".", 1)[0] not in {"world", "session", "surface", "epistemic"}:
             raise ValueError("mutation path must start with world, session, surface, or epistemic")
         return value

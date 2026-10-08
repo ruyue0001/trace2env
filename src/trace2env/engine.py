@@ -9,6 +9,7 @@ from uuid import uuid4
 from trace2env.eligibility import rule_eligible
 
 from trace2env.models import (
+    normalize_state_path,
     Condition,
     EnvironmentState,
     Invariant,
@@ -28,43 +29,90 @@ MISSING = object()
 _RAISE_MISSING = object()
 
 
+def _names_a_file(segment: str) -> bool:
+    """A segment that is a filesystem path or a URL: the dots after it belong to the key, not to nested fields."""
+    return segment.startswith("/") or segment.startswith("~/") or "://" in segment
+
+
+def _step_key(container: dict[str, Any], parts: list[str], index: int, value: Any) -> tuple[str, int]:
+    """The key of ``container`` that ``parts[index:]`` addresses, and the index of the first segment left over.
+
+    An ordinary segment is a key by itself. A segment that names a file or URL (``/app/report.txt``,
+    ``https://shop.example.com/cart``) absorbs the segments after it, since maps such as ``world.files`` are keyed by
+    names that contain dots: an existing key is matched longest-first; writing an object creates or replaces the whole
+    entry; reading or deleting addresses the longest existing key, else the whole remainder; writing a scalar or a
+    list addresses the last segment as an attribute of the entry named by the rest
+    (``world.files./app/report.txt.content``)."""
+    segment = parts[index]
+    if not _names_a_file(segment) or index == len(parts) - 1:
+        return segment, index + 1
+    joins = [(".".join(parts[index:stop]), stop) for stop in range(len(parts), index, -1)]  # longest first
+    full = joins[0][0]
+    if full in container:
+        return full, len(parts)
+    if isinstance(value, dict):
+        prefix, stop = joins[1]
+        entry = container.get(prefix)
+        if isinstance(entry, dict) and parts[-1] in entry:  # an attribute the entry already has
+            return prefix, stop
+        return full, len(parts)
+    for key, stop in joins[1:]:
+        if key in container:
+            return key, stop
+    return (full, len(parts)) if value is _RAISE_MISSING else joins[1]
+
+
 def get_path(value: Any, path: str, default: Any = _RAISE_MISSING) -> Any:
     current = value
-    for part in path.split("."):
-        if isinstance(current, dict) and part in current:
-            current = current[part]
+    parts = normalize_state_path(path).split(".")
+    index = 0
+    while index < len(parts):
+        part = parts[index]
+        if isinstance(current, dict):
+            key, index = _step_key(current, parts, index, _RAISE_MISSING)
+            if key in current:
+                current = current[key]
+                continue
         elif isinstance(current, list) and part.isdigit() and int(part) < len(current):
             current = current[int(part)]
-        else:
-            if default is _RAISE_MISSING:
-                raise KeyError(path)
-            return default
+            index += 1
+            continue
+        if default is _RAISE_MISSING:
+            raise KeyError(path)
+        return default
     return current
 
 
 def set_path(value: dict[str, Any], path: str, new_value: Any, create: bool = True) -> None:
-    parts = path.split(".")
+    parts = normalize_state_path(path).split(".")
     current = value
-    for part in parts[:-1]:
-        child = current.get(part)
+    index = 0
+    while True:
+        key, index = _step_key(current, parts, index, new_value)
+        if index >= len(parts):
+            current[key] = new_value
+            return
+        child = current.get(key)
         if child is None and create:
             child = {}
-            current[part] = child
+            current[key] = child
         if not isinstance(child, dict):
-            raise ValueError(f"Cannot traverse non-object at {part} in {path}")
+            raise ValueError(f"Cannot traverse non-object at {key} in {path}")
         current = child
-    current[parts[-1]] = new_value
 
 
 def delete_path(value: dict[str, Any], path: str) -> None:
-    parts = path.split(".")
+    parts = normalize_state_path(path).split(".")
     current: Any = value
-    for part in parts[:-1]:
-        if not isinstance(current, dict) or part not in current:
+    index = 0
+    while isinstance(current, dict):
+        key, index = _step_key(current, parts, index, _RAISE_MISSING)
+        if index >= len(parts):
+            current.pop(key, None)
             return
-        current = current[part]
-    if isinstance(current, dict):
-        current.pop(parts[-1], None)
+        if key not in current:
+            return
+        current = current[key]
 
 
 class UnresolvableOperand(KeyError):

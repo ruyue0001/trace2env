@@ -4,6 +4,11 @@ This guide maps the paper's experiments to the code, the scripts and the data. E
 system with the settings below. The scripts and reports use the lab's run labels, which map to the paper's system names
 as follows; the code's "package" is the paper's worldbook.
 
+The reported runs predate the state-path fix of 2026-10-08 (file-name segments and bracket notation now address whole
+map entries, see [DEVELOPMENT.md](DEVELOPMENT.md)): with that code, part of the state tracker's mutations were dropped
+or nested (6% of them on terminal with GPT-5.6-Sol, 19% with DeepSeek, under 3% elsewhere with GPT and up to 10% with
+DeepSeek), so a re-run of a Trace2Env system sees a more complete state; the baselines carry no state.
+
 | Run label | Paper name |
 |---|---|
 | `prompting` | Direct Prompting |

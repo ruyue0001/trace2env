@@ -458,6 +458,42 @@ class MapMutationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "non-object"):
             apply_mutations(EnvironmentState(world={"count": 1}), [StateMutation(op="merge", path="world.count", value={"a": 1})])
 
+    def test_file_names_with_dots_address_map_entries(self):
+        """``world.files./app/report.txt`` is the entry ``/app/report.txt``, not a nested ``txt`` key (DeepSeek emitted
+        such effects live: a ``delete`` then left an empty ``/app/report`` behind and the file seemed to survive ``mv``)."""
+        from trace2env.engine import apply_mutations, get_path
+        from trace2env.models import EnvironmentState, StateMutation
+
+        created = apply_mutations(EnvironmentState(), [
+            StateMutation(op="create", path="world.files./app/report.txt", value={"type": "file", "content": "x\n"})])
+        self.assertEqual(created.world["files"], {"/app/report.txt": {"type": "file", "content": "x\n"}})
+        edited = apply_mutations(created, [StateMutation(op="set", path="world.files./app/report.txt.content", value="y\n"),
+                                           StateMutation(op="set", path="world.files./app/data.tar.gz.size", value=3)])
+        self.assertEqual(edited.world["files"]["/app/report.txt"]["content"], "y\n")
+        self.assertEqual(edited.world["files"]["/app/data.tar.gz"], {"size": 3}, "a scalar write names an attribute")
+        self.assertEqual(get_path(edited.model_dump(mode="python"), "world.files./app/report.txt.content"), "y\n")
+        moved = apply_mutations(edited, [StateMutation(op="create", path="world.files./app/summary.txt", value={"type": "file"}),
+                                         StateMutation(op="delete", path="world.files./app/report.txt")])
+        self.assertEqual(set(moved.world["files"]), {"/app/summary.txt", "/app/data.tar.gz"}, "mv leaves nothing behind")
+        backup = apply_mutations(moved, [StateMutation(op="create", path="world.files./app/summary.txt.bak", value={"type": "file"})])
+        self.assertIn("/app/summary.txt.bak", backup.world["files"], "a key extending an existing one is its own entry")
+        merged = apply_mutations(backup, [StateMutation(op="merge", path="world.files./app/summary.txt", value={"mode": "0644"})])
+        self.assertEqual(merged.world["files"]["/app/summary.txt"], {"type": "file", "mode": "0644"})
+        pages = apply_mutations(EnvironmentState(), [StateMutation(op="set", path="world.pages.https://shop.example.com/cart.items", value=2)])
+        self.assertEqual(pages.world["pages"], {"https://shop.example.com/cart": {"items": 2}}, "URLs are names too")
+        nested = apply_mutations(EnvironmentState(), [StateMutation(op="set", path="world.git.branches.main", value="abc")])
+        self.assertEqual(nested.world["git"], {"branches": {"main": "abc"}}, "ordinary segments still nest")
+        # bracket notation, the other spelling models emit, is the same path (it was rejected as undeclared live)
+        from trace2env.models import StateField, StateSchema, normalize_state_path
+        from trace2env.validation import validate_mutations
+        self.assertEqual(normalize_state_path('world.files["/app/report.txt"].content'), "world.files./app/report.txt.content")
+        self.assertEqual(normalize_state_path("world.files['/app/report.txt']['mode']"), "world.files./app/report.txt.mode")
+        self.assertEqual(normalize_state_path("world.files[/app/x]"), "world.files./app/x")
+        bracket = StateMutation(op="create", path='world.files["/app/report.txt"]', value={"type": "file"})
+        self.assertEqual(bracket.path, "world.files./app/report.txt")
+        validate_mutations([bracket], StateSchema(fields=[StateField(path="world.files", type="object")]), None)
+        self.assertEqual(apply_mutations(EnvironmentState(), [bracket]).world["files"], {"/app/report.txt": {"type": "file"}})
+
     def test_action_tokens_resolve_inside_map_keys(self):
         from trace2env.engine import apply_mutations
         from trace2env.models import ActionSpec, ArgumentSpec, EnvironmentState, StateField, StateMutation, StateSchema

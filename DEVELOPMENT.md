@@ -61,6 +61,11 @@ Each stage writes `WORK/stages/<stage>/v<N>/` with `inputs.json`, `calls.jsonl` 
 `extra="forbid"`. State paths start with `world`, `session`, `surface`, or `epistemic`; dynamic values use
 `{"$action_arg": ...}` or `{action.arguments.name}` tokens (`engine.resolve_*`, checked by `validation.py`). Mutation
 ops: `set`/`create`, `delete`, `increment`/`decrement`, `append`, `schedule`, `merge`, `remove`.
+Maps keyed by file paths or URLs (`world.files`) are edited with `merge`/`remove`, or addressed by name: a path
+segment that starts with `/` or `~/` or contains `://` absorbs the segments after it, so `world.files./app/report.txt`
+is the entry `/app/report.txt` (existing keys match longest-first; an object value writes the whole entry, a scalar
+names the last segment as an attribute), and bracket notation such as `world.files["/app/report.txt"]` is
+normalized to that form (`engine._step_key`, `models.normalize_state_path`).
 
 **Offline construction (`reconstruction.py`).** `adapters.load_raw_traces` → episodes with content-derived ids →
 `segment_transitions` (action/result pairing by call id, else sequential; ambiguous cases flagged, never guessed) →
